@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pl" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Money</title>
+
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/master.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Money</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Debit</a></li>
+            <li><a href="#credit">Credit</a></li>
+            <li><a href="#report">Report</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container" ng-controller="AppCtrl">
+      <div class="starter-template">
+        <h1>Debits {{totalAmount | currency}}</h1>
+        <fieldset><legend>Search</legend>
+          <form class="form-inline" novalidate>
+            <div class="form-group">
+                <select class="form-control" ng-model="searchMonth" ng-change="search()" ng-options="parseInt(key) as value for (key, value ) in months"></select>
+                <select class="form-control" ng-model="searchYear" ng-options="year for year in years" ng-change="search()"></select>
+
+                <input class="form-control" type="text" ng-model="searchKeyword" placeholder="seach"/>
+            </div>
+          </form>
+        <fieldset>
+        <br/>
+        <fieldset><legend>Debit</legend>
+          <form name="debitform" class="form-inline" ng-submit="saveContact()" novalidate>
+
+              <div class="form-group" ng-class="{ 'has-error' : debitform.contactType.$invalid && !debitform.contactType.$pristine }">
+                <label class="btn btn-default" ng-repeat="category in debitCategory" title="{{type.name}}">
+                  <input type="radio" ng-checked="{{category.default}}" value="{{category.value}}" name="debitCategory" ng-model="debit.category" />
+                  <span class="{{category.icon}}"></span>
+                </label>
+              </div>
+              <br/>
+              <br/>
+              <div class="form-group" ng-class="{ 'has-error' : debitform.description.$invalid && !debitform.description.$pristine }">
+                <input type="text" name="description" class="form-control" ng-model="debit.description" required placeholder="Name" />
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-error' : debitform.amount.$invalid && !debitform.amount.$pristine }">
+                <input type="number" name="amount" step="0.01" class="form-control" ng-model="debit.amount" required placeholder="Amount"/>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-error' : debitform.year.$invalid && !debitform.year.$pristine }">
+                <select class="form-control" name="year" ng-model="debit.year" ng-options="year for year in years" required></select>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-error' : debitform.month.$invalid && !debitform.month.$pristine }">
+                <select class="form-control" name="month" ng-model="debit.month" ng-options="parseInt(key) as value for (key, value ) in months" required></select>
+              </div>
+
+              <button type="sumbit" class="btn btn-primary" ng-disabled="debitform.$invalid" ng-show="isSaveAvailable">Save</button>
+              <button type="button" class="btn btn-info" ng-click="update()" ng-disabled="debitform.$invalid" ng-show="isUpdateAvailable">Update</button>
+              <button type="button" class="btn btn-info" ng-click="cancelUpdate()" ng-disabled="debitform.$invalid" ng-show="isCancelUpdateAvailable">Cancel</button>
+        </form>
+      </fieldset>
+<br/>
+          <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Category
+              </th>
+              <th>
+                Description
+              </th>
+              <th>
+                Amount
+              </th>
+              <th>
+                Year
+              </th>
+              <th>
+                Month
+              </th>
+              <th colspan="2">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="debit in debits | filter: searchKeyword">
+              <td>
+                <span class="{{debit.category.icon}}" title="{{debit.category.name}}"></span>
+                {{debit.category.name}}
+              </td>
+              <td>
+                {{debit.description}}
+              </td>
+              <td>
+                {{debit.amount | currency}}
+              </td>
+              <td>
+                {{debit.year}}
+              </td>
+              <td>
+                {{debit.month | monthName}} <!-- date:'MMMM' -->
+              </td>
+              <td>
+                <button type="button" class="btn btn-warning" ng-click="edit(debit._id)">Edit</button>
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger" ng-click="delete(debit._id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div><!-- /.container -->
+
+    <script src="/bower_components/angular/angular.min.js"></script>
+    <script src="/bower_components/angular-i18n/angular-locale_pl-pl.js"></script>
+    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="controllers/controller.js"></script>
+  </body>
+</html>

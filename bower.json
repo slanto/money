@@ -1,0 +1,21 @@
+{
+  "name": "money",
+  "version": "0.0.0",
+  "authors": [
+    "slanto <slanto@slanto.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.6",
+    "angular-i18n": "~1.4.6",
+    "bootstrap": "~3.3.5",
+    "jquery": "~2.1.4"
+  }
+}
