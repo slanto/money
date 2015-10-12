@@ -130,6 +130,7 @@
 			};
 
 			$scope.saveContact = function() {
+				// console.log($scope.debit);
 				$http.post('/debit', $scope.debit).success(function(response) {
 					refresh();
 				});
