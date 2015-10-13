@@ -65,7 +65,7 @@
 
                 <div class="form-group">
                   <label class="btn btn-default" ng-repeat="category in debitCategory" title="{{category.name}}">
-                    <input type="radio" ng-checked="{{category.default}}" value="{{category.value}}" name="debitCategory" ng-model="debit.category" />
+                    <input type="radio" ng-checked="{{category.default}}" value="{{category._id}}" name="debitCategory" ng-model="debit.category" />
                     <span class="{{category.icon}}"></span>
                   </label>
                 </div>

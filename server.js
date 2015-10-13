@@ -10,11 +10,20 @@ db.on('error', console.error.bind(console, "connection error"));
 db.once('open', function() {
   console.log("Connection to \"budget\" is open...");
 
-  var debitSchema = mongoose.Schema({
+  var DebitCategorySchema = mongoose.Schema({
+    value: Number,
+    name: String,
+    default: Boolean,
+    icon: String
+  });
+
+  DebitCategory = mongoose.model('debitcategory', DebitCategorySchema);
+
+  var DebitSchema = mongoose.Schema({
    year: Number,
    month: Number,
    created: {type: Date, default: Date.now },
-   category: Number,
+   category: {type: mongoose.Schema.Types.ObjectId, ref: 'debitcategory'},
    description: String,
    amount: {
      type: Number,
@@ -24,15 +33,8 @@ db.once('open', function() {
    }
  });
 
- var debitCategorySchema = mongoose.Schema({
-   value: Number,
-   name: String,
-   default: Boolean,
-   icon: String
- });
+ Debit = mongoose.model('debit', DebitSchema);
 
- Debit = mongoose.model('debit', debitSchema);
- DebitCategory = mongoose.model('debitcategory', debitCategorySchema);
 })
 
 var amountFactor = 1000;
@@ -63,10 +65,9 @@ app.get('/debit/:year?/:month?', function(req, res) {
   var totalAmount = 0;
   var result = {};
 
-  Debit.find(criteria).sort({ created: -1}).exec(function(err, contacts) {
+  Debit.find(criteria).sort({created: -1}).populate('category').exec(function(err, contacts) {
     if (err) return handleError(err);
 
-    //res.json(contacts);
     contacts.forEach(function(doc, index) {
         totalAmount += doc.amount;
         doc.amount = doc.amount;// / amountFactor;

@@ -34,15 +34,6 @@
 								});
 								return deffered.promise;
 						},
-						getTypeById: function(input, id) {
-							var i = 0, len = input.length;
-					    for (; i<len; i++) {
-					      if (+input[i].value === +id) {
-					        return input[i];
-					      }
-					    }
-					    return null;
-						},
 						getYears: function() {
 				 			var currentYear = new Date().getFullYear();
 				 			var years = [];
@@ -71,20 +62,7 @@
 
 			var refresh = function() {
 				utils.getContactList($scope.searchYear, $scope.searchMonth).then(function(response){
-						var debits = [];
-						angular.forEach(response.items, function(value, key) {
-							var debit = value;
-							var foundType = utils.getTypeById($scope.debitCategory, value.category);
-
-							debit.category = {
-								id: foundType.value,
-								name: foundType.name,
-								icon: foundType.icon
-							}
-
-							debits.push(debit);
-						});
-						$scope.debits = debits;
+						$scope.debits = response.items;
 						$scope.totalAmount = response.totalAmount;
 						clearAndSetDefault();
 				});
@@ -117,7 +95,7 @@
 				$scope.debit = {
 					year: date.getFullYear(),
 					month: date.getMonth() + 1,
-					type: 1
+					category: $scope.debitCategory[0]._id
 				};
 
 				setDefaultButtonsAvailability();
@@ -129,8 +107,7 @@
 				clearAndSetDefault();
 			};
 
-			$scope.saveContact = function() {
-				// console.log($scope.debit);
+			$scope.saveContact = function() {				
 				$http.post('/debit', $scope.debit).success(function(response) {
 					refresh();
 				});
