@@ -12,6 +12,9 @@
 
 		myApp.service('utils', ['$http', '$q', function($http, $q) {
 				return {
+					limit: function() {
+						return 5;
+					},
 					getContactTypes: function() {
 						var deffered = $q.defer();
 							$http.get('/debitcategory')
@@ -23,9 +26,20 @@
 								});
 							return deffered.promise;
 						},
-						getContactList: function(year, month) {
+						getDebits: function(year, month, limit) {
 							var deffered = $q.defer();
-							$http.get('/debit/' + year + '/' + month)
+							$http.get('/debit/' + year + '/' + month + '/' + limit)
+								.success(function(response) {
+									deffered.resolve(response);
+								})
+								.error(function(msg, code){
+									deffered.reject(msg);
+								});
+								return deffered.promise;
+						},
+						getTotalDebit: function(year, month) {
+							var deffered = $q.defer();
+							$http.get('/totaldebit/' + year + '/' + month)
 								.success(function(response) {
 									deffered.resolve(response);
 								})
@@ -61,17 +75,23 @@
 	  myApp.controller('AppCtrl', ['$scope', '$http', '$filter', 'utils', function($scope, $http, $filter, utils) {
 
 			var refresh = function() {
-				utils.getContactList($scope.searchYear, $scope.searchMonth).then(function(response){
-						$scope.debits = response.items;
-						$scope.totalAmount = response.totalAmount;
-						clearAndSetDefault();
-				});
+				utils.getDebits($scope.searchYear, $scope.searchMonth, utils.limit())
+					.then(function(response) {
+							$scope.debits = response;
+							clearAndSetDefault();
+						});
+
+				utils.getTotalDebit($scope.searchYear, $scope.searchMonth)
+					.then(function(response){
+							$scope.totalAmount = response;
+					});
 			};
 
 			var setDefaultButtonsAvailability = function() {
 				$scope.isSaveAvailable = true;
 				$scope.isUpdateAvailable = false;
 				$scope.isCancelUpdateAvailable = false;
+				$scope.isShowAllDebitsVisible = true;
 			}
 
 			var init = function() {
@@ -103,11 +123,19 @@
 
 			init();
 
+			$scope.showAllDebits = function() {
+				$scope.isShowAllDebitsVisible = false;
+				utils.getDebits($scope.searchYear, $scope.searchMonth)
+					.then(function(response) {
+							$scope.debits = response;
+						});
+			};
+
 			$scope.addContact = function() {
 				clearAndSetDefault();
 			};
 
-			$scope.saveContact = function() {				
+			$scope.saveContact = function() {
 				$http.post('/debit', $scope.debit).success(function(response) {
 					refresh();
 				});

@@ -57,7 +57,15 @@
 
       <div class="starter-template">
 
-        <h2>Wydatki {{totalAmount | currency}}</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <h1>Wydatki<small> {{totalAmount | currency}}</small></h1>
+        </div>
+        <div class="col-md-6">
+          <h2><small>{{searchMonth | monthName}}</small> {{searchYear}}</h2>
+        </div>
+      </div>
+
 
         <div class="row">
           <div class="col-md-6">
@@ -92,23 +100,14 @@
               </form>
           </div>
           <div class="col-md-6">
-            <table class="table">
+            <table class="table table-hover">
               <thead>
               <tr>
                 <th>
-                  Kategoria
-                </th>
-                <th>
-                  Opis
+                  Typ
                 </th>
                 <th>
                   Kwota
-                </th>
-                <th>
-                  Rok
-                </th>
-                <th>
-                  Miesiąc
                 </th>
                 <th>
                 </th>
@@ -117,19 +116,10 @@
               <tbody>
                 <tr ng-repeat="debit in debits | filter: searchKeyword">
                 <td>
-                  <span class="{{debit.category.icon}}" title="{{debit.category.name}}"></span>
-                </td>
-                <td>
-                  {{debit.description}}
+                  <span class="{{debit.category.icon}}" title="{{debit.category.name}} {{debit.description}}"></span>
                 </td>
                 <td>
                   {{debit.amount | currency}}
-                </td>
-                <td>
-                  {{debit.year}}
-                </td>
-                <td>
-                  {{debit.month | monthName}} <!-- date:'MMMM' -->
                 </td>
                 <td>
                   <button type="button" class="btn btn-warning" ng-click="edit(debit._id)">Edytuj</button>
@@ -137,6 +127,7 @@
               </tr>
             </tbody>
             </table>
+            <button type="button" class="btn btn-default" ng-click="showAllDebits()" ng-show="isShowAllDebitsVisible">Pokaż wszystkie</button>
           </div>
         </div>
       </div>

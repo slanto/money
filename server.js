@@ -25,17 +25,16 @@ db.once('open', function() {
    created: {type: Date, default: Date.now },
    category: {type: mongoose.Schema.Types.ObjectId, ref: 'debitcategory'},
    description: String,
-   amount: {
-     type: Number,
-     get: function(value) {
-       return value / amountFactor;
-     }
-   }
+   amount: Number
  });
 
  Debit = mongoose.model('debit', DebitSchema);
 
 })
+
+handleError = function(err) {
+  console.log(err);
+};
 
 var amountFactor = 1000;
 
@@ -46,36 +45,52 @@ app.use(bodyParser.json());
 app.get('/debit/:id', function(req, res) {
   var id = req.params.id;
   Debit.findById(id).exec(function(err, doc) {
-    doc.amount = doc.amount;// / amountFactor;
+    doc.amount = doc.amount / amountFactor;
     res.json(doc);
   });
 });
 
-app.get('/debit/:year?/:month?', function(req, res) {
+app.get('/debit/:year/:month/:limit?', function(req, res) {
   var criteria = {};
 
-  if (req.params.year) {
-    criteria.year = parseInt(req.params.year);
-  }
+  criteria.year = parseInt(req.params.year);
+  criteria.month = parseInt(req.params.month);
 
-  if (req.params.month) {
-    criteria.month = parseInt(req.params.month);
-  }
+  var limit = req.params.limit;
 
-  var totalAmount = 0;
   var result = {};
 
-  Debit.find(criteria).sort({created: -1}).populate('category').exec(function(err, contacts) {
-    if (err) return handleError(err);
+  Debit.find(criteria)
+    .limit(limit)
+    .sort({created: -1})
+    .populate('category')
+    .exec(function(err, contacts) {
+      if (err) return handleError(err);
 
-    contacts.forEach(function(doc, index) {
-        totalAmount += doc.amount;
-        doc.amount = doc.amount;// / amountFactor;
-      })
+      contacts.forEach(function(doc, index) {
+          doc.amount = doc.amount / amountFactor;
+      });
 
-      result.items = contacts;
-      result.totalAmount = totalAmount;// / amountFactor;
-      res.json(result);
+      res.json(contacts);
+  });
+});
+
+app.get('/totaldebit/:year/:month', function(req, res) {
+  var criteria = {};
+
+  criteria.year = parseInt(req.params.year);
+  criteria.month = parseInt(req.params.month);
+
+  var total = 0;
+  Debit.find(criteria)
+    .exec(function(err, contacts) {
+      if (err) return handleError(err);
+
+      contacts.forEach(function(doc, index) {
+          total += doc.amount;
+      });
+
+      res.json(total / amountFactor);
   });
 });
 
