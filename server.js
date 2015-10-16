@@ -30,13 +30,32 @@ db.once('open', function() {
 
  Debit = mongoose.model('debit', DebitSchema);
 
+ var CreditCategorySchema = mongoose.Schema({
+   name: String,
+   default: Boolean,
+   icon: String
+ });
+
+ CreditCategory = mongoose.model('creditcategory', CreditCategorySchema);
+
+ var CreditSchema = mongoose.Schema({
+  year: Number,
+  month: Number,
+  created: {type: Date, default: Date.now },
+  category: {type: mongoose.Schema.Types.ObjectId, ref: 'creditcategory'},
+  description: String,
+  amount: Number
+});
+
+Credit = mongoose.model('credit', CreditSchema);
+
 })
 
 handleError = function(err) {
   console.log(err);
 };
 
-var amountFactor = 1000;
+var amountFactor = 100;
 
 app.use(express.static(__dirname + "/public"));
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
@@ -129,6 +148,94 @@ app.put('/debit/:id', function(req, res) {
 
 app.get('/debitcategory', function(req, res) {
     DebitCategory.find(function(err, docs) {
+        res.json(docs);
+    });
+});
+
+//TODO: move to separate files
+app.get('/credit/:id', function(req, res) {
+  var id = req.params.id;
+  Credit.findById(id).exec(function(err, doc) {
+    doc.amount = doc.amount / amountFactor;
+    res.json(doc);
+  });
+});
+
+app.get('/credit/:year/:month/:limit?', function(req, res) {
+  var criteria = {};
+
+  criteria.year = parseInt(req.params.year);
+  criteria.month = parseInt(req.params.month);
+
+  var limit = req.params.limit;
+
+  var result = {};
+
+  Credit.find(criteria)
+    .limit(limit)
+    .sort({created: -1})
+    .populate('category')
+    .exec(function(err, credits) {
+      if (err) return handleError(err);
+
+      credits.forEach(function(doc, index) {
+          doc.amount = doc.amount / amountFactor;
+      });
+
+      res.json(credits);
+  });
+});
+
+app.get('/totalcredit/:year/:month', function(req, res) {
+  var criteria = {};
+
+  criteria.year = parseInt(req.params.year);
+  criteria.month = parseInt(req.params.month);
+
+  var total = 0;
+  Credit.find(criteria)
+    .exec(function(err, credits) {
+      if (err) return handleError(err);
+
+      credits.forEach(function(doc, index) {
+          total += doc.amount;
+      });
+
+      res.json(total / amountFactor);
+  });
+});
+
+app.post('/credit', function(req, res){
+  var row = req.body;
+  row.amount = getAmount(row.amount);
+  Credit.create(row, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+app.delete('/credit/:id', function(req, res) {
+  var id = req.params.id;
+  Credit.remove({ _id: mongoose.Types.ObjectId(id) }, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+app.put('/credit/:id', function(req, res) {
+  var id = req.params.id;
+  Credit.update({_id: mongoose.Types.ObjectId(id)}, {
+        description: req.body.description,
+        amount: getAmount(req.body.amount),
+        year: req.body.year,
+        month: req.body.month,
+        created: req.body.created,
+        category: req.body.category
+      }, function(err, doc){
+        res.json(doc);
+      });
+});
+
+app.get('/creditcategory', function(req, res) {
+    CreditCategory.find(function(err, docs) {
         res.json(docs);
     });
 });
