@@ -3,12 +3,12 @@ var app = express();
 var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/budget');
+mongoose.connect('mongodb://localhost/money');
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, "connection error"));
 db.once('open', function() {
-  console.log("Connection to \"budget\" is open...");
+  console.log("Connection to \"money\" is open...");
 
   var DebitCategorySchema = mongoose.Schema({
     value: Number,

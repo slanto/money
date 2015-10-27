@@ -173,7 +173,8 @@
 				$scope.debit = {
 					year: date.getFullYear(),
 					month: date.getMonth() + 1,
-					category: $scope.debitCategory[0]._id
+					category: $scope.debitCategory[0]._id,
+					amount: 0
 				};
 
 				setDefaultButtonsAvailability();
@@ -184,7 +185,8 @@
 				$scope.credit = {
 					year: date.getFullYear(),
 					month: date.getMonth() + 1,
-					category: $scope.creditCategory[0]._id
+					category: $scope.creditCategory[0]._id,
+					amount: 0
 				};
 
 				setDefaultButtonsAvailabilityForCredit();
@@ -219,6 +221,7 @@
 			};
 
 			$scope.saveCredit = function() {
+				console.log($scope.credit);
 				$http.post('/credit', $scope.credit).success(function(response) {
 					refreshCredit();
 				});
@@ -227,6 +230,12 @@
 			$scope.delete = function(id) {
 				$http.delete('/debit/' + id).success(function(response) {
 					refresh();
+				});
+			};
+
+			$scope.deleteCredit = function(id) {
+				$http.delete('/credit/' + id).success(function(response) {
+					refreshCredit();
 				});
 			};
 
@@ -255,17 +264,6 @@
 			$scope.search = function() {
 				refresh();
 				refreshCredit();
-
-				// $scope.credit = {
-				// 		year: $scope.searchYear,
-				// 		month: $scope.searchMonth
-				// };
-				//
-				// $scope.debit = {
-				// 	year: $scope.searchYear,
-				// 	month: $scope.searchMonth
-				// };
-
 			};
 
 			$scope.update = function() {
