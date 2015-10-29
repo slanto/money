@@ -169,10 +169,9 @@
 			};
 
 			var clearAndSetDefault = function() {
-				var date = new Date();
 				$scope.debit = {
-					year: date.getFullYear(),
-					month: date.getMonth() + 1,
+					year: $scope.searchYear,
+					month: $scope.searchMonth,
 					category: $scope.debitCategory[0]._id,
 					amount: 0
 				};
@@ -180,11 +179,10 @@
 				setDefaultButtonsAvailability();
 			};
 
-			var clearAndSetDefaultForCredit = function() {
-				var date = new Date();
+			var clearAndSetDefaultForCredit = function() {				
 				$scope.credit = {
-					year: date.getFullYear(),
-					month: date.getMonth() + 1,
+					year: $scope.searchYear,
+					month: $scope.searchMonth,
 					category: $scope.creditCategory[0]._id,
 					amount: 0
 				};
