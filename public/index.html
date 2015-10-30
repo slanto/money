@@ -36,8 +36,7 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Wydatki</a></li>
-            <li><a href="#credit">Przychody</a></li>
+            <li class="active"><a href="#">Budżet</a></li>
             <li><a href="#report">Raport</a></li>
           </ul>
           <form class="navbar-form navbar-right">
@@ -55,168 +54,168 @@
       </div>
     </nav>
 
-      <div class="starter-template">
+      <h1><small>Saldo</small> {{totalBalance | currency}} <small>{{ searchMonth | monthName}} {{searchYear}}</small>
+      </h1>
 
-      <div class="row">
-        <div class="col-md-12">
-          <h1>Saldo {{totalBalance | currency}}</h1>
+
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Wydatki {{totalAmount | currency}}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <form name="debitform" ng-submit="saveContact()" novalidate>
+
+                        <div class="form-group">
+                          <label class="btn btn-default" ng-repeat="category in debitCategory" title="{{category.name}}">
+                            <input type="radio" ng-checked="{{category.default}}" value="{{category._id}}" name="debitCategory" ng-model="debit.category" />
+                            <span class="{{category.icon}}"></span>
+                          </label>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : debitform.amount.$invalid && !debitform.amount.$pristine }">
+                          <input type="number" name="amount" step="0.01" class="form-control" ng-model="debit.amount" required placeholder="Kwota"/>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : debitform.year.$invalid && !debitform.year.$pristine }">
+                          <select class="form-control" name="year" ng-model="debit.year" ng-options="year for year in years" required></select>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : debitform.month.$invalid && !debitform.month.$pristine }">
+                          <select class="form-control" name="month" ng-model="debit.month" ng-options="parseInt(key) as value for (key, value ) in months" required></select>
+                        </div>
+
+                        <div class="form-group">
+                          <textarea name="description" rows="2" class="form-control" ng-model="debit.description" placeholder="Opis"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" ng-disabled="debitform.$invalid" ng-show="isSaveAvailable">Zapisz</button>
+                        <button type="button" class="btn btn-info" ng-click="cancelUpdate()" ng-disabled="debitform.$invalid" ng-show="isCancelUpdateAvailable">Anuluj</button>
+                        <button type="button" class="btn btn-info" ng-click="update()" ng-disabled="debitform.$invalid" ng-show="isUpdateAvailable">Zapisz</button>
+                      </form>
+                  </div>
+                  <div class="col-md-6">
+                    <table class="table table-hover">
+                      <thead>
+                      <tr>
+                        <th>
+                          Typ
+                        </th>
+                        <th>
+                          Kwota
+                        </th>
+                        <th>
+                        </th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="debit in debits | filter: searchKeyword">
+                        <td>
+                          <span class="{{debit.category.icon}}" title="{{debit.description}}"></span>
+                        </td>
+                        <td>
+                          {{debit.amount | currency}}
+                        </td>
+                        <td>
+                          <button type="button" class="btn btn-warning" ng-click="edit(debit._id)">Edytuj</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                    </table>
+                    <button type="button" class="btn btn-default" ng-click="showAllDebits()" ng-show="isShowAllDebitsVisible">Pokaż wszystkie</button>
+                  </div>
+                </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Przychody {{totalCreditAmount | currency}}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              <div class="row">
+                  <div class="col-md-6">
+                    <form name="creditform" ng-submit="saveCredit()" novalidate>
+
+                        <div class="form-group">
+                          <label class="btn btn-default" ng-repeat="category in creditCategory" title="{{category.name}}">
+                            <input type="radio" ng-checked="{{category.default}}" value="{{category._id}}" name="creditCategory" ng-model="credit.category" />
+                            <span class="{{category.icon}}"></span>
+                          </label>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : creditform.amount.$invalid && !creditform.amount.$pristine }">
+                          <input type="number" name="amount" step="0.01" class="form-control" ng-model="credit.amount" required placeholder="Kwota"/>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : creditform.year.$invalid && !creditform.year.$pristine }">
+                          <select class="form-control" name="year" ng-model="credit.year" ng-options="year for year in years" required></select>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : creditform.month.$invalid && !creditform.month.$pristine }">
+                          <select class="form-control" name="month" ng-model="credit.month" ng-options="parseInt(key) as value for (key, value ) in months" required></select>
+                        </div>
+
+                        <div class="form-group">
+                          <textarea name="description" rows="2" class="form-control" ng-model="credit.description" placeholder="Opis"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" ng-disabled="creditform.$invalid" ng-show="isSaveCreditAvailable">Zapisz</button>
+                        <button type="button" class="btn btn-info" ng-click="cancelUpdateCredit()" ng-disabled="creditform.$invalid" ng-show="isCancelUpdateCreditAvailable">Anuluj</button>
+                        <button type="button" class="btn btn-info" ng-click="updateCredit()" ng-disabled="creditform.$invalid" ng-show="isUpdateCreditAvailable">Zapisz</button>
+                      </form>
+                  </div>
+                  <div class="col-md-6">
+                    <table class="table table-hover">
+                      <thead>
+                      <tr>
+                        <th>
+                          Typ
+                        </th>
+                        <th>
+                          Kwota
+                        </th>
+                        <th>
+                        </th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="credit in credits | filter: searchKeyword">
+                        <td>
+                          <span class="{{credit.category.icon}}" title="{{credit.category.name}} {{credit.description}}"></span>
+                        </td>
+                        <td>
+                          {{credit.amount | currency}}
+                        </td>
+                        <td>
+                          <button type="button" class="btn btn-warning" ng-click="editCredit(credit._id)">Edytuj</button>
+                          <!-- <button type="button" class="btn btn-error" ng-click="deleteCredit(credit._id)">Usuń</button> -->
+                        </td>
+                      </tr>
+                    </tbody>
+                    </table>
+                  </div>
+                </div>
+
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h1>Wydatki<small> {{totalAmount | currency}}</small></h1>
-        </div>
-        <div class="col-md-6">
-          <h2><small>{{searchMonth | monthName}}</small> {{searchYear}}</h2>
-        </div>
-      </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <form name="debitform" ng-submit="saveContact()" novalidate>
-
-                <div class="form-group">
-                  <label class="btn btn-default" ng-repeat="category in debitCategory" title="{{category.name}}">
-                    <input type="radio" ng-checked="{{category.default}}" value="{{category._id}}" name="debitCategory" ng-model="debit.category" />
-                    <span class="{{category.icon}}"></span>
-                  </label>
-                </div>
-
-                <div class="form-group" ng-class="{ 'has-error' : debitform.amount.$invalid && !debitform.amount.$pristine }">
-                  <input type="number" name="amount" step="0.01" class="form-control" ng-model="debit.amount" required placeholder="Kwota"/>
-                </div>
-
-                <div class="form-group" ng-class="{ 'has-error' : debitform.year.$invalid && !debitform.year.$pristine }">
-                  <select class="form-control" name="year" ng-model="debit.year" ng-options="year for year in years" required></select>
-                </div>
-
-                <div class="form-group" ng-class="{ 'has-error' : debitform.month.$invalid && !debitform.month.$pristine }">
-                  <select class="form-control" name="month" ng-model="debit.month" ng-options="parseInt(key) as value for (key, value ) in months" required></select>
-                </div>
-
-                <div class="form-group">
-                  <textarea name="description" rows="2" class="form-control" ng-model="debit.description" placeholder="Opis"></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary" ng-disabled="debitform.$invalid" ng-show="isSaveAvailable">Zapisz</button>
-                <button type="button" class="btn btn-info" ng-click="cancelUpdate()" ng-disabled="debitform.$invalid" ng-show="isCancelUpdateAvailable">Anuluj</button>
-                <button type="button" class="btn btn-info" ng-click="update()" ng-disabled="debitform.$invalid" ng-show="isUpdateAvailable">Zapisz</button>
-              </form>
-          </div>
-          <div class="col-md-6">
-            <table class="table table-hover">
-              <thead>
-              <tr>
-                <th>
-                  Typ
-                </th>
-                <th>
-                  Kwota
-                </th>
-                <th>
-                </th>
-              </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="debit in debits | filter: searchKeyword">
-                <td>
-                  <span class="{{debit.category.icon}}" title="{{debit.description}}"></span>
-                </td>
-                <td>
-                  {{debit.amount | currency}}
-                </td>
-                <td>
-                  <button type="button" class="btn btn-warning" ng-click="edit(debit._id)">Edytuj</button>
-                </td>
-              </tr>
-            </tbody>
-            </table>
-            <button type="button" class="btn btn-default" ng-click="showAllDebits()" ng-show="isShowAllDebitsVisible">Pokaż wszystkie</button>
-          </div>
-        </div>
-
-<!-- credit -->
-
-<br/>
-<br/>
-
-<div class="row">
-  <div class="col-md-6">
-    <h1>Przychody<small> {{totalCreditAmount | currency}}</small></h1>
-  </div>
-  <div class="col-md-6">
-    <h2><small>{{searchMonth | monthName}}</small> {{searchYear}}</h2>
-  </div>
-</div>
 
 
-  <div class="row">
-    <div class="col-md-6">
-      <form name="creditform" ng-submit="saveCredit()" novalidate>
-
-          <div class="form-group">
-            <label class="btn btn-default" ng-repeat="category in creditCategory" title="{{category.name}}">
-              <input type="radio" ng-checked="{{category.default}}" value="{{category._id}}" name="creditCategory" ng-model="credit.category" />
-              <span class="{{category.icon}}"></span>
-            </label>
-          </div>
-
-          <div class="form-group" ng-class="{ 'has-error' : creditform.amount.$invalid && !creditform.amount.$pristine }">
-            <input type="number" name="amount" step="0.01" class="form-control" ng-model="credit.amount" required placeholder="Kwota"/>
-          </div>
-
-          <div class="form-group" ng-class="{ 'has-error' : creditform.year.$invalid && !creditform.year.$pristine }">
-            <select class="form-control" name="year" ng-model="credit.year" ng-options="year for year in years" required></select>
-          </div>
-
-          <div class="form-group" ng-class="{ 'has-error' : creditform.month.$invalid && !creditform.month.$pristine }">
-            <select class="form-control" name="month" ng-model="credit.month" ng-options="parseInt(key) as value for (key, value ) in months" required></select>
-          </div>
-
-          <div class="form-group">
-            <textarea name="description" rows="2" class="form-control" ng-model="credit.description" placeholder="Opis"></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary" ng-disabled="creditform.$invalid" ng-show="isSaveCreditAvailable">Zapisz</button>
-          <button type="button" class="btn btn-info" ng-click="cancelUpdateCredit()" ng-disabled="creditform.$invalid" ng-show="isCancelUpdateCreditAvailable">Anuluj</button>
-          <button type="button" class="btn btn-info" ng-click="updateCredit()" ng-disabled="creditform.$invalid" ng-show="isUpdateCreditAvailable">Zapisz</button>
-        </form>
-    </div>
-    <div class="col-md-6">
-      <table class="table table-hover">
-        <thead>
-        <tr>
-          <th>
-            Typ
-          </th>
-          <th>
-            Kwota
-          </th>
-          <th>
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="credit in credits | filter: searchKeyword">
-          <td>
-            <span class="{{credit.category.icon}}" title="{{credit.category.name}} {{credit.description}}"></span>
-          </td>
-          <td>
-            {{credit.amount | currency}}
-          </td>
-          <td>
-            <button type="button" class="btn btn-warning" ng-click="editCredit(credit._id)">Edytuj</button>
-            <!-- <button type="button" class="btn btn-error" ng-click="deleteCredit(credit._id)">Usuń</button> -->
-          </td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
-  </div>
-
-
-<!-- credit end -->
-      </div>
     </div><!-- /.container -->
 
     <script src="/bower_components/angular/angular.min.js"></script>
