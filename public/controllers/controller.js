@@ -81,6 +81,17 @@
 									});
 									return deffered.promise;
 							},
+							getTotalBalance: function(year, month) {
+								var deffered = $q.defer();
+								$http.get('/totalbalance/' + year + '/' + month)
+									.success(function(response) {
+										deffered.resolve(response);
+									})
+									.error(function(msg, code){
+										deffered.reject(msg);
+									});
+									return deffered.promise;
+							},
 						getYears: function() {
 				 			var currentYear = new Date().getFullYear();
 				 			var years = [];
@@ -119,11 +130,16 @@
 					.then(function(response){
 							$scope.totalAmount = response;
 					});
+
+					utils.getTotalBalance($scope.searchYear, $scope.searchMonth)
+						.then(function(response) {
+							$scope.totalBalance = response;
+						});
 			};
 
 			var refreshCredit = function() {
 
-				utils.getCredits($scope.searchYear, $scope.searchMonth, utils.limit())
+				utils.getCredits($scope.searchYear, $scope.searchMonth)
 					.then(function(response) {
 							$scope.credits = response;
 							clearAndSetDefaultForCredit();
@@ -133,6 +149,11 @@
 					.then(function(response){
 							$scope.totalCreditAmount = response;
 					});
+
+					utils.getTotalBalance($scope.searchYear, $scope.searchMonth)
+						.then(function(response) {
+							$scope.totalBalance = response;
+						});
 			};
 
 			var setDefaultButtonsAvailability = function() {
@@ -163,9 +184,9 @@
 				});
 
 				utils.getCreditCategories().then(function(response) {
-					$scope.creditCategory = response;
-					refreshCredit();
-				});
+						$scope.creditCategory = response;
+						refreshCredit();
+					});
 			};
 
 			var clearAndSetDefault = function() {
@@ -179,7 +200,7 @@
 				setDefaultButtonsAvailability();
 			};
 
-			var clearAndSetDefaultForCredit = function() {				
+			var clearAndSetDefaultForCredit = function() {
 				$scope.credit = {
 					year: $scope.searchYear,
 					month: $scope.searchMonth,

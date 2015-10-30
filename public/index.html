@@ -58,6 +58,11 @@
       <div class="starter-template">
 
       <div class="row">
+        <div class="col-md-12">
+          <h1>Saldo {{totalBalance | currency}}</h1>
+        </div>
+      </div>
+      <div class="row">
         <div class="col-md-6">
           <h1>Wydatki<small> {{totalAmount | currency}}</small></h1>
         </div>
@@ -201,12 +206,11 @@
           </td>
           <td>
             <button type="button" class="btn btn-warning" ng-click="editCredit(credit._id)">Edytuj</button>
-            <button type="button" class="btn btn-error" ng-click="deleteCredit(credit._id)">Usuń</button>
+            <!-- <button type="button" class="btn btn-error" ng-click="deleteCredit(credit._id)">Usuń</button> -->
           </td>
         </tr>
       </tbody>
       </table>
-      <button type="button" class="btn btn-default" ng-click="showAllCredits()" ng-show="isShowAllCreditsVisible">Pokaż wszystkie</button>
     </div>
   </div>
 

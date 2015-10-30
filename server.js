@@ -205,6 +205,39 @@ app.get('/totalcredit/:year/:month', function(req, res) {
   });
 });
 
+//TODO: use Async.waterfall
+app.get('/totalbalance/:year/:month', function(req, res) {
+
+  var criteria = {};
+
+  criteria.year = parseInt(req.params.year);
+  criteria.month = parseInt(req.params.month);
+
+  var totalcredit = 0;
+  var totaldebit = 0;
+  var balance = 0;
+
+    Credit.find(criteria)
+      .exec(function(err, credits) {
+        if (err) return handleError(err);
+        credits.forEach(function(doc, index) {
+            totalcredit += doc.amount;
+        });
+
+        Debit.find(criteria)
+          .exec(function(err, contacts) {
+            if (err) return handleError(err);
+            contacts.forEach(function(doc, index) {
+                totaldebit += doc.amount;
+            });
+
+            balance = (totalcredit - totaldebit) / amountFactor;
+
+            res.json(balance);
+        });
+    });
+});
+
 app.post('/credit', function(req, res){
   var row = req.body;
   row.amount = getAmount(row.amount);
