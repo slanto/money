@@ -119,7 +119,7 @@ var getAmount = function(str) {
 
 app.post('/debit', function(req, res){
   var row = req.body;
-  row.amount = getAmount(row.amount);
+  row.amount = getAmount(row.amount);  
   Debit.create(row, function(err, doc) {
     res.json(doc);
   });
