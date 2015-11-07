@@ -1,69 +1,67 @@
-(function () {
+
 	'use strict';
 
-  var myApp = angular.module('myApp', []);
+		app.directive("decimals", function ($filter) {
+	    return {
+	        restrict: "A", // Only usable as an attribute of another HTML element
+	        require: "?ngModel",
+	        scope: {
+	            decimals: "@",
+	            decimalPoint: "@"
+	        },
+	        link: function (scope, element, attr, ngModel) {
+	            var decimalCount = parseInt(scope.decimals) || 2;
+	            var decimalPoint = scope.decimalPoint || ".";
 
-	myApp.directive("decimals", function ($filter) {
-    return {
-        restrict: "A", // Only usable as an attribute of another HTML element
-        require: "?ngModel",
-        scope: {
-            decimals: "@",
-            decimalPoint: "@"
-        },
-        link: function (scope, element, attr, ngModel) {
-            var decimalCount = parseInt(scope.decimals) || 2;
-            var decimalPoint = scope.decimalPoint || ".";
+	            // Run when the model is first rendered and when the model is changed from code
+	            ngModel.$render = function() {
+	                if (ngModel.$modelValue != null && ngModel.$modelValue >= 0) {
+	                    if (typeof decimalCount === "number") {
+	                        element.val(ngModel.$modelValue.toFixed(decimalCount).toString().replace(".", ","));
+	                    } else {
+	                        element.val(ngModel.$modelValue.toString().replace(".", ","));
+	                    }
+	                }
+	            }
 
-            // Run when the model is first rendered and when the model is changed from code
-            ngModel.$render = function() {
-                if (ngModel.$modelValue != null && ngModel.$modelValue >= 0) {
-                    if (typeof decimalCount === "number") {
-                        element.val(ngModel.$modelValue.toFixed(decimalCount).toString().replace(".", ","));
-                    } else {
-                        element.val(ngModel.$modelValue.toString().replace(".", ","));
-                    }
-                }
-            }
+	            // Run when the view value changes - after each keypress
+	            // The returned value is then written to the model
+	            ngModel.$parsers.unshift(function(newValue) {
+	                if (typeof decimalCount === "number") {
+	                    var floatValue = parseFloat(newValue.replace(",", "."));
+	                    if (decimalCount === 0) {
+	                        return parseInt(floatValue);
+	                    }
+	                    return parseFloat(floatValue.toFixed(decimalCount));
+	                }
 
-            // Run when the view value changes - after each keypress
-            // The returned value is then written to the model
-            ngModel.$parsers.unshift(function(newValue) {
-                if (typeof decimalCount === "number") {
-                    var floatValue = parseFloat(newValue.replace(",", "."));
-                    if (decimalCount === 0) {
-                        return parseInt(floatValue);
-                    }
-                    return parseFloat(floatValue.toFixed(decimalCount));
-                }
+	                return parseFloat(newValue.replace(",", "."));
+	            });
 
-                return parseFloat(newValue.replace(",", "."));
-            });
+	            // Formats the displayed value when the input field loses focus
+	            element.on("change", function(e) {
+	                var floatValue = parseFloat(element.val().replace(",", "."));
+	                if (!isNaN(floatValue) && typeof decimalCount === "number") {
+	                    if (decimalCount === 0) {
+	                        element.val(parseInt(floatValue));
+	                    } else {
+	                        var strValue = floatValue.toFixed(decimalCount);
+	                        element.val(strValue.replace(".", decimalPoint));
+	                    }
+	                }
+	            });
+	        }
+	    }
+		});
 
-            // Formats the displayed value when the input field loses focus
-            element.on("change", function(e) {
-                var floatValue = parseFloat(element.val().replace(",", "."));
-                if (!isNaN(floatValue) && typeof decimalCount === "number") {
-                    if (decimalCount === 0) {
-                        element.val(parseInt(floatValue));
-                    } else {
-                        var strValue = floatValue.toFixed(decimalCount);
-                        element.val(strValue.replace(".", decimalPoint));
-                    }
-                }
-            });
-        }
-    }
-});
-
-	 myApp.filter('monthName', ['utils', function(utils) {
+	 app.filter('monthName', ['utils', function(utils) {
 			return function (monthNumber) { //1 = January
 					var monthNames = utils.getMonths();
 					return monthNames[monthNumber];
 			}
 		}]);
 
-		myApp.service('utils', ['$http', '$q', function($http, $q) {
+		app.service('utils', ['$http', '$q', function($http, $q) {
 				return {
 					limit: function() {
 						return 5;
@@ -162,7 +160,7 @@
 					}
 				}]);
 
-	  myApp.controller('AppCtrl', ['$scope', '$http', '$filter', 'utils', function($scope, $http, $filter, utils) {
+	  app.controller('BudgetController', ['$scope', '$http', '$filter', 'utils', function($scope, $http, $filter, utils) {
 
 			var refresh = function() {
 
@@ -351,6 +349,4 @@
 			$scope.cancelUpdateCredit = function() {
 				clearAndSetDefaultForCredit();
 			};
-	}]);
-
-}());
+		}]);
