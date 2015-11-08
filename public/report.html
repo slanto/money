@@ -1,1 +1,8 @@
-<h1>Report</h1>
+<form class="navbar-form navbar-right">
+    <div class="form-group">
+      <select class="form-control" ng-model="searchYear" ng-options="year for year in years" ng-change="search()"></select>
+    </div>
+</form>
+
+<h1><small>Saldo</small> {{totalBalance | currency}} <small>{{searchYear}}</small>
+</h1>

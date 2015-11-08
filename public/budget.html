@@ -51,9 +51,11 @@
                     <textarea name="description" rows="2" class="form-control" ng-model="debit.description" placeholder="Opis"></textarea>
                   </div>
 
-                  <button type="submit" class="btn btn-primary" ng-disabled="debitform.$invalid" ng-show="isSaveAvailable">Zapisz</button>
-                  <button type="button" class="btn btn-info" ng-click="cancelUpdate()" ng-disabled="debitform.$invalid" ng-show="isCancelUpdateAvailable">Anuluj</button>
-                  <button type="button" class="btn btn-info" ng-click="update()" ng-disabled="debitform.$invalid" ng-show="isUpdateAvailable">Zapisz</button>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary pull-right" ng-disabled="debitform.$invalid" ng-show="isSaveAvailable">Zapisz</button>
+                    <button type="button" class="btn btn-primary pull-right" ng-click="update()" ng-disabled="debitform.$invalid" ng-show="isUpdateAvailable">Zapisz</button>
+                    <button type="button" class="btn btn-primary pull-right" ng-click="cancelUpdate()" ng-disabled="debitform.$invalid" ng-show="isCancelUpdateAvailable">Anuluj</button>
+                  </div>
                 </form>
             </div>
             <div class="col-md-6">
@@ -61,7 +63,7 @@
                 <thead>
                 <tr>
                   <th>
-                    Typ
+                    Kategoria
                   </th>
                   <th>
                     Kwota
@@ -72,19 +74,20 @@
                 </thead>
                 <tbody>
                   <tr ng-repeat="debit in debits | filter: searchKeyword">
-                  <td>
-                    <span class="{{debit.category.icon}}" title="{{debit.description}}"></span>
+                  <td title="{{debit.description}}">
+                    <span class="{{debit.category.icon}}"> {{debit.category.name}}</span>
                   </td>
                   <td>
                     {{debit.amount | currency}}
                   </td>
                   <td>
-                    <button type="button" class="btn btn-warning" ng-click="edit(debit._id)">Edytuj</button>
+                    <button type="button" class="btn btn-primary" ng-click="edit(debit._id)">Edytuj</button>
+                    <button type="button" class="btn btn-warning" ng-really-message="Czy na pewno chcesz usunąć wydatek?" ng-really-click="delete(debit._id)">Usuń</button>
                   </td>
                 </tr>
               </tbody>
               </table>
-              <button type="button" class="btn btn-default" ng-click="showAllDebits()" ng-show="isShowAllDebitsVisible">Pokaż wszystkie</button>
+              <button type="button" class="btn btn-link pull-right" ng-click="showAllDebits()" ng-show="isShowAllDebitsVisible">Pokaż wszystkie</button>
             </div>
           </div>
 
@@ -128,9 +131,11 @@
                     <textarea name="description" rows="2" class="form-control" ng-model="credit.description" placeholder="Opis"></textarea>
                   </div>
 
-                  <button type="submit" class="btn btn-primary" ng-disabled="creditform.$invalid" ng-show="isSaveCreditAvailable">Zapisz</button>
-                  <button type="button" class="btn btn-info" ng-click="cancelUpdateCredit()" ng-disabled="creditform.$invalid" ng-show="isCancelUpdateCreditAvailable">Anuluj</button>
-                  <button type="button" class="btn btn-info" ng-click="updateCredit()" ng-disabled="creditform.$invalid" ng-show="isUpdateCreditAvailable">Zapisz</button>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary pull-right" ng-disabled="creditform.$invalid" ng-show="isSaveCreditAvailable">Zapisz</button>
+                    <button type="button" class="btn btn-primary pull-right" ng-click="updateCredit()" ng-disabled="creditform.$invalid" ng-show="isUpdateCreditAvailable">Zapisz</button>
+                    <button type="button" class="btn btn-primary pull-right" ng-click="cancelUpdateCredit()" ng-disabled="creditform.$invalid" ng-show="isCancelUpdateCreditAvailable">Anuluj</button>
+                  </div>
                 </form>
             </div>
             <div class="col-md-6">
@@ -138,7 +143,7 @@
                 <thead>
                 <tr>
                   <th>
-                    Typ
+                    Kategoria
                   </th>
                   <th>
                     Kwota
@@ -149,15 +154,15 @@
                 </thead>
                 <tbody>
                   <tr ng-repeat="credit in credits | filter: searchKeyword">
-                  <td>
-                    <span class="{{credit.category.icon}}" title="{{credit.category.name}} {{credit.description}}"></span>
+                  <td title="{{credit.description}}">
+                    <span class="{{credit.category.icon}}" > {{credit.category.name}}</span>
                   </td>
                   <td>
                     {{credit.amount | currency}}
                   </td>
                   <td>
-                    <button type="button" class="btn btn-warning" ng-click="editCredit(credit._id)">Edytuj</button>
-                    <!-- <button type="button" class="btn btn-error" ng-click="deleteCredit(credit._id)">Usuń</button> -->
+                    <button type="button" class="btn btn-primary" ng-click="editCredit(credit._id)">Edytuj</button>
+                    <button type="button" class="btn btn-warning" ng-really-message="Czy na pewno chcesz usunąć przychód?" ng-really-click="deleteCredit(credit._id)">Usuń</button>
                   </td>
                 </tr>
               </tbody>
