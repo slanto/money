@@ -12,6 +12,8 @@
     "body-parser": "^1.13.3",
     "bower": "^1.5.2",
     "express": "^4.13.3",
-    "mongoose": "^4.1.10"
+    "mongoose": "^4.1.10",
+    "gulp": "~3.9.0",
+    "gulp-nodemon": "~2.0.4"
   }
 }
