@@ -26,10 +26,13 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8000;
 
 var debitRouter = require('./routes/debitRoute')(Debit);
+var creditRouter = require('./routes/creditRoute')(Credit);
 var totalDebitRouter = require('./routes/totalDebitRoute')(Debit);
+
 
 app.use('/debit', debitRouter);
 app.use('/totaldebit', totalDebitRouter);
+app.use('/credit', creditRouter);
 
 var getAmount = function(str) {
   return str * amountFactor;
@@ -41,38 +44,10 @@ app.get('/debitcategory', function(req, res) {
     });
 });
 
-//TODO: move to separate files
-app.get('/credit/:id', function(req, res) {
-  var id = req.params.id;
-  Credit.findById(id).exec(function(err, doc) {
-    doc.amount = doc.amount / amountFactor;
-    res.json(doc);
-  });
-});
-
-app.get('/credit/:year/:month/:limit?', function(req, res) {
-  var criteria = {};
-
-  criteria.year = parseInt(req.params.year);
-  criteria.month = parseInt(req.params.month);
-
-  var limit = req.params.limit;
-
-  var result = {};
-
-  Credit.find(criteria)
-    .limit(limit)
-    .sort({created: -1})
-    .populate('category')
-    .exec(function(err, credits) {
-      if (err) return handleError(err);
-
-      credits.forEach(function(doc, index) {
-          doc.amount = doc.amount / amountFactor;
-      });
-
-      res.json(credits);
-  });
+app.get('/creditcategory', function(req, res) {
+    CreditCategory.find(function(err, docs) {
+        res.json(docs);
+    });
 });
 
 app.get('/totalcredit/:year/:month', function(req, res) {
@@ -124,41 +99,6 @@ app.get('/totalbalance/:year/:month', function(req, res) {
 
             res.json(balance);
         });
-    });
-});
-
-app.post('/credit', function(req, res){
-  var row = req.body;
-  row.amount = getAmount(row.amount);
-  Credit.create(row, function(err, doc) {
-    res.json(doc);
-  });
-});
-
-app.delete('/credit/:id', function(req, res) {
-  var id = req.params.id;
-  Credit.remove({ _id: mongoose.Types.ObjectId(id) }, function(err, doc) {
-    res.json(doc);
-  });
-});
-
-app.put('/credit/:id', function(req, res) {
-  var id = req.params.id;
-  Credit.update({_id: mongoose.Types.ObjectId(id)}, {
-        description: req.body.description,
-        amount: getAmount(req.body.amount),
-        year: req.body.year,
-        month: req.body.month,
-        created: req.body.created,
-        category: req.body.category
-      }, function(err, doc){
-        res.json(doc);
-      });
-});
-
-app.get('/creditcategory', function(req, res) {
-    CreditCategory.find(function(err, docs) {
-        res.json(docs);
     });
 });
 

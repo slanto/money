@@ -24,6 +24,7 @@ var routes = function(Debit) {
   //     else if (debit){
   //       console.log("found debit " + debit);
   //       req.debit = debit;
+  //       next();
   //     }
   //     else {
   //       res.status(404).send('no debit found');
